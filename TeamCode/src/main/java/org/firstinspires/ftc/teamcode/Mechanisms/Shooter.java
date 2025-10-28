@@ -41,6 +41,11 @@ public class Shooter
         motorShooter.setPower(power*12/voltageSensor.getVoltage());
     }
 
+    private void controleDeVelocidade()
+    {
+        double x = 2;
+    }
+
     private boolean isAccelerating = false;
     ElapsedTime accelTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
     double initialVelocity = 0.0;
