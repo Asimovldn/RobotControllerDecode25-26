@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.testeLimelight;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.json.JSONObject;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @TeleOp
-public class limelightDistCalculo extends OpMode {
-
+public class LLmountAngulo extends OpMode {
     private static final String LIMELIGHT_URL = "http://limelight.local:5807/target";
 
     private Limelight3A limelight;
@@ -27,7 +27,7 @@ public class limelightDistCalculo extends OpMode {
 
     private double distancia;
 
-    private double power;
+    private double arcTan;
 
     @Override
     public void init() {
@@ -42,18 +42,12 @@ public class limelightDistCalculo extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Distancia", getDistancia(distancia));
-        telemetry.addData("EstimatedShooterPower", estimateShooterPower(power));
+        telemetry.addData("MountingAngle", getArcTan(a1));
     }
 
     public double getDistancia(double distancia) {
         distancia = (h2-h1) / Math.tan(Math.toRadians(a1)+Math.toRadians(a2));
         return distancia;
-    }
-
-    public double estimateShooterPower(double power) {
-        power = distancia / 408.92;
-        return power;
     }
 
     private double getTy() {
@@ -82,5 +76,11 @@ public class limelightDistCalculo extends OpMode {
             return 0.0; //fallback value (?)
         }
     }
+
+    public double getArcTan(double arcTan) {
+        arcTan = Math.atan((h2 - h1) / distancia) - a2;
+        return a1 = arcTan;
+    }
+
 
 }
