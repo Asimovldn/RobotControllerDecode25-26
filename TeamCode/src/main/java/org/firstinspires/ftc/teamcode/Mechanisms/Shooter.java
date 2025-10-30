@@ -39,7 +39,7 @@ public class Shooter
         motorShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         //TODO Arrumar a direção de tal forma que valor positivo lance o projétil
-        motorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorShooter.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     private void setPower(double power)
@@ -82,6 +82,6 @@ public class Shooter
 
     public double getVelocitySetPoint() { return velocitySetPoint;}
     public double getAccelSetPoint() { return accelSetPoint;}
-    public double getCurrentVelocity(AngleUnit angleUnit) { return motorShooter.getVelocity(angleUnit);}
+    public double getCurrentVelocity() { return motorShooter.getVelocity(AngleUnit.DEGREES);}
 
 }

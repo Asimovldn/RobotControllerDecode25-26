@@ -12,6 +12,6 @@ public class ShooterConstants
 {
     public static double ADMISSABLE_VELOCITY_ERROR = Math.toRadians(10); // rad/s
     public static double SHOOTER_ACCEL = Math.toRadians(10); //rad/s^2
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.05,0,0.001);
-    public static FeedForwardCoefficients ffCoefficients = new FeedForwardCoefficients(0.03,0.003,0.02);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0,0,0);
+    public static FeedForwardCoefficients ffCoefficients = new FeedForwardCoefficients(0,0,0);
 }

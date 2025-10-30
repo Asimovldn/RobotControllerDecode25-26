@@ -37,9 +37,9 @@ public class TesteControleVel extends LinearOpMode
 
             while (shooter.isBusy() && opModeIsActive()) {
                 shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", shooter.getVelocitySetPoint());
+                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
                 telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity(AngleUnit.RADIANS));
+                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
 
                 telemetry.update();
 
@@ -50,9 +50,9 @@ public class TesteControleVel extends LinearOpMode
             while (waitTimer.time() < 3 && opModeIsActive())
             {
                 shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", shooter.getVelocitySetPoint());
+                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
                 telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity(AngleUnit.RADIANS));
+                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
 
                 telemetry.update();
             }
@@ -63,9 +63,9 @@ public class TesteControleVel extends LinearOpMode
 
             while (shooter.isBusy() && opModeIsActive()) {
                 shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", shooter.getVelocitySetPoint());
+                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
                 telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity(AngleUnit.RADIANS));
+                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
 
                 telemetry.update();
 
@@ -76,9 +76,9 @@ public class TesteControleVel extends LinearOpMode
             while (waitTimer.time() < 3 && opModeIsActive())
             {
                 shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", shooter.getVelocitySetPoint());
+                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
                 telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity(AngleUnit.RADIANS));
+                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
 
                 telemetry.update();
             }
