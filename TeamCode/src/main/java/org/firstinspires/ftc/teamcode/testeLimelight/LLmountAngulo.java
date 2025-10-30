@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.testeLimelight;
+/* package org.firstinspires.ftc.teamcode.testeLimelight;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -17,17 +17,7 @@ public class LLmountAngulo extends OpMode {
 
     private Limelight3A limelight;
 
-    private final double h2 = 29.5; // height of target (inches)
-
-    private double h1 = 11.81; // height of camera  (inches)
-
-    private double a1; // mounting angle
-
-    private double a2 = getTy(); // angle from camera
-
-    private double distancia;
-
-    private double arcTan;
+    private final double a2 = getTy(); // angle from camera
 
     @Override
     public void init() {
@@ -42,12 +32,8 @@ public class LLmountAngulo extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("MountingAngle", getArcTan(a1));
-    }
-
-    public double getDistancia(double distancia) {
-        distancia = (h2-h1) / Math.tan(Math.toRadians(a1)+Math.toRadians(a2));
-        return distancia;
+        telemetry.addData("MountingAngle", getArcTan());
+        telemetry.update();
     }
 
     private double getTy() {
@@ -77,10 +63,15 @@ public class LLmountAngulo extends OpMode {
         }
     }
 
-    public double getArcTan(double arcTan) {
-        arcTan = Math.atan((h2 - h1) / distancia) - a2;
-        return a1 = arcTan;
+    public double getArcTan() {
+        // distance from target goal (inches)
+        double distancia = 78.74;
+        // height of target (inches)
+        double h2 = 29.5;
+        // height of camera  (inches)
+        double h1 = 11.81;
+        return Math.atan((h2 - h1) / distancia) - a2;
     }
 
 
-}
+} */

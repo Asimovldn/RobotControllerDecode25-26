@@ -1,38 +1,39 @@
 package org.firstinspires.ftc.teamcode.testeLimelight;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.json.JSONObject;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class limelightDistCalculo extends OpMode {
 
-    private static final String LIMELIGHT_URL = "http://limelight.local:5807/target";
-
     private Limelight3A limelight;
 
-    private final double h2 = 29.5; // height of target (inches)
+    private final double h2 = 75; // height of target (inches)
 
-    private double h1 = 11.81; // height of camera  (inches)
+    private final double h1 = 24; // height of camera  (inches)
 
-    private double a1; // mounting angle
+    private final double a1 = 6.37438269675366061426525612185; // 0.221 radians (?) or 12.662 degrees (?)
 
-    private double a2 = getTy(); // angle from camera
+    private double ty; // angle from camera
 
     private double distancia;
 
-    private double power;
 
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(8);
+        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
     }
 
     @Override
@@ -42,45 +43,23 @@ public class limelightDistCalculo extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("Distancia", getDistancia(distancia));
-        telemetry.addData("EstimatedShooterPower", estimateShooterPower(power));
-    }
+        LLResult result = limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            ty = result.getTy();
 
-    public double getDistancia(double distancia) {
-        distancia = (h2-h1) / Math.tan(Math.toRadians(a1)+Math.toRadians(a2));
-        return distancia;
-    }
-
-    public double estimateShooterPower(double power) {
-        power = distancia / 408.92;
-        return power;
-    }
-
-    private double getTy() {
-        try { URL url = new URL(LIMELIGHT_URL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection(); // opens an http connection
-            conn.setRequestMethod("GET"); //request type; retrieving data
-            conn.setConnectTimeout(200); //prevents robot freeze if no response
-            conn.setReadTimeout(200); //prevents robot freeze if no response
-
-            BufferedReader reader = new BufferedReader( // buffers the text; reads it faster
-                    new InputStreamReader(conn.getInputStream()) //gets limelight stream; the values we want
-            );           //^ InputStreamReader will turn the stream obtained from bytes into a string
-            StringBuilder response = new StringBuilder();  //creates a new empty stringBuilder to hold the .json object as text
-            String line;
-            while ((line = reader.readLine()) != null) { //reads the buffered text line by line
-                response.append(line); //appends each line to the empty stringBuilder
-            }
-            reader.close(); //closes reader when done
-
-            JSONObject json = new JSONObject(response.toString()); //parses the string into a JSON object
-            return json.getDouble("ty"); //extracts "ty" value from objects and returns it
-
-
-        } catch (Exception e) { //catches errors
-            telemetry.addData("ErrorDetected: ", e.getMessage()); //error debugging message
-            return 0.0; //fallback value (?)
+            telemetry.addData("Target Y", ty);
+        } else {
+            telemetry.addData("Target Y", "No target found");
         }
+        double distCm = getDistancia(result.getTy());
+        telemetry.addData("Distancia", distCm);
+        telemetry.update();
+
+    }
+
+    public double getDistancia(double ty) {
+        distancia = (h2 - h1) / Math.tan(Math.toRadians(a1 + ty));
+        return distancia;
     }
 
 }
