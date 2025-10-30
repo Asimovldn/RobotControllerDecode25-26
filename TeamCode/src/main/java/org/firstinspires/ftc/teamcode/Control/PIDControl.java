@@ -12,11 +12,11 @@ public class PIDControl
 
     private double lastError = 0;
 
-    public PIDControl(double kp, double ki, double kd)
+    public PIDControl(PIDCoefficients pidCoefficients)
     {
-        this.kp = kp;
-        this.ki = ki;
-        this.kd = kd;
+        this.kp = pidCoefficients.kp;
+        this.ki = pidCoefficients.ki;
+        this.kd = pidCoefficients.kd;
     }
 
     public void resetIntegral()

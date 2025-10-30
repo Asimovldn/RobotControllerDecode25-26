@@ -6,15 +6,15 @@ public class FeedForwardControl
     private double ka;
     private double ks;
 
-    public FeedForwardControl(double kv, double ka, double ks)
+    public FeedForwardControl(FeedForwardCoefficients ffCoefficients)
     {
-        this.kv = kv;
-        this.ka = ka;
-        this.ks = ks;
+        this.kv = ffCoefficients.kv;
+        this.ka = ffCoefficients.ka;
+        this.ks = ffCoefficients.ks;
     }
 
-    public double calculate(double velocitySetPoint, double accelSetPoint)
+    public double calculate(double velocitySetPoint, double accelSetPoint, int dir)
     {
-        return velocitySetPoint * kv + accelSetPoint * ka + ks;
+        return velocitySetPoint * kv + accelSetPoint * ka + ks * dir;
     }
 }
