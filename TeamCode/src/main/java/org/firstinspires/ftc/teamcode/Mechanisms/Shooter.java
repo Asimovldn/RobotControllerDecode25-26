@@ -10,77 +10,78 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Control.FeedForwardControl;
 import org.firstinspires.ftc.teamcode.Control.PIDControl;
+import org.firstinspires.ftc.teamcode.Mechanisms.Constants.ShooterConstants;
 
 public class Shooter
 {
     private DcMotorEx motorShooter;
 
-    private final PIDControl velocityCorrectionPID = new PIDControl(0,0,0);
-    private final FeedForwardControl velocityFF = new FeedForwardControl(0,0,0);
-
     private VoltageSensor voltageSensor;
 
-    final static double ADMISSABLE_VELOCITY_ERROR = 10; // rad/s
-    final static double SHOOTER_ACCEL = 10; //rad/s^2
+    private double targetVelocity;
+    private double initialVelocity;
+    private ElapsedTime accelTimer;
+    private double timeToAccel;
+
+    private double velocitySetPoint;
+    private double accelSetPoint;
+
 
     public void init(HardwareMap hardwareMap)
     {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
+        accelTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
+        // TODO Arrumar o nome do motor
         motorShooter = hardwareMap.get(DcMotorEx.class, "motor_shooter");
 
         motorShooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motorShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         //TODO Arrumar a direção de tal forma que valor positivo lance o projétil
-        motorShooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        motorShooter.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     private void setPower(double power)
     {
-        motorShooter.setPower(power*12/voltageSensor.getVoltage());
+        motorShooter.setPower(power);
     }
 
-    private void controleDeVelocidade()
-    {
-        double x = 2;
-    }
-
-    private boolean isAccelerating = false;
-    ElapsedTime accelTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
-    double initialVelocity = 0.0;
-
-    // Velocidade em rad/s
     public void setShooterAngularVelocity(double angularVelocity)
     {
-        double velocity = 0;
-        double accel = 0;
-        if (Math.abs(angularVelocity - motorShooter.getVelocity(AngleUnit.RADIANS)) < ADMISSABLE_VELOCITY_ERROR)
-        {
-            isAccelerating = false;
-            // PID e FF
-            accel = 0;
-            velocity = angularVelocity + velocityCorrectionPID.calculate(motorShooter.getVelocity(AngleUnit.RADIANS), angularVelocity);
-        } else {
-            // Acelera/Desacelera em direção ao alvo com FF
-
-            if (!isAccelerating)
-            {
-                accelTimer.reset();
-                initialVelocity = motorShooter.getVelocity(AngleUnit.RADIANS);
-            }
-
-            double dir = Math.signum(angularVelocity - motorShooter.getVelocity(AngleUnit.RADIANS));
-
-            accel = SHOOTER_ACCEL * dir;
-            velocity = initialVelocity + accel * accelTimer.time();
-
-            isAccelerating = true;
-
-        }
-
-        setPower(velocityFF.calculate(velocity, accel));
+        initialVelocity = targetVelocity;
+        targetVelocity = angularVelocity;
+        timeToAccel = Math.abs(targetVelocity - initialVelocity) / ShooterConstants.SHOOTER_ACCEL;
+        accelTimer.reset();
     }
 
+    public void updateShooter()
+    {
+        double currVelocity = motorShooter.getVelocity(AngleUnit.RADIANS);
+        double dir = Math.signum(targetVelocity - initialVelocity);
+
+        if (isBusy()) {
+            velocitySetPoint = targetVelocity;
+            accelSetPoint = 0;
+        } else {
+            velocitySetPoint = initialVelocity + dir * ShooterConstants.SHOOTER_ACCEL * accelTimer.time();
+            accelSetPoint = ShooterConstants.SHOOTER_ACCEL;
+        }
+
+        PIDControl velocityPID = new PIDControl(ShooterConstants.pidCoefficients);
+        FeedForwardControl velocityFF = new FeedForwardControl(ShooterConstants.ffCoefficients);
+
+        setPower(velocityPID.calculate(currVelocity, velocitySetPoint) +
+                velocityFF.calculate(velocitySetPoint, accelSetPoint, (int) dir));
+    }
+
+    public boolean isBusy()
+    {
+        return accelTimer.time() > timeToAccel;
+    }
+
+    public double getVelocitySetPoint() { return velocitySetPoint;}
+    public double getAccelSetPoint() { return accelSetPoint;}
+    public double getCurrentVelocity() { return motorShooter.getVelocity(AngleUnit.DEGREES);}
 
 }
