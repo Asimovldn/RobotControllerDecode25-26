@@ -60,12 +60,12 @@ public class Shooter
         double currVelocity = motorShooter.getVelocity(AngleUnit.RADIANS);
         double dir = Math.signum(targetVelocity - initialVelocity);
 
-        if (isBusy()) {
+        if (!isBusy()) {
             velocitySetPoint = targetVelocity;
             accelSetPoint = 0;
         } else {
             velocitySetPoint = initialVelocity + dir * ShooterConstants.SHOOTER_ACCEL * accelTimer.time();
-            accelSetPoint = ShooterConstants.SHOOTER_ACCEL;
+            accelSetPoint = ShooterConstants.SHOOTER_ACCEL * dir;
         }
 
         PIDControl velocityPID = new PIDControl(ShooterConstants.pidCoefficients);
@@ -77,7 +77,7 @@ public class Shooter
 
     public boolean isBusy()
     {
-        return accelTimer.time() > timeToAccel;
+        return accelTimer.time() < timeToAccel;
     }
 
     public double getVelocitySetPoint() { return velocitySetPoint;}

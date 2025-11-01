@@ -30,58 +30,18 @@ public class TesteControleVel extends LinearOpMode
 
         ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
+        shooter.setShooterAngularVelocity(Math.toRadians(1500));
+
         while (opModeIsActive())
         {
-            shooter.setShooterAngularVelocity(Math.toRadians(720));
 
+            shooter.updateShooter();
+            telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
+            telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
+            telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
 
-            while (shooter.isBusy() && opModeIsActive()) {
-                shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
-                telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
+            telemetry.update();
 
-                telemetry.update();
-
-            }
-
-            waitTimer.reset();
-
-            while (waitTimer.time() < 3 && opModeIsActive())
-            {
-                shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
-                telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
-
-                telemetry.update();
-            }
-
-
-            shooter.setShooterAngularVelocity(Math.toRadians(180));
-
-
-            while (shooter.isBusy() && opModeIsActive()) {
-                shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
-                telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
-
-                telemetry.update();
-
-            }
-
-            waitTimer.reset();
-
-            while (waitTimer.time() < 3 && opModeIsActive())
-            {
-                shooter.updateShooter();
-                telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
-                telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
-                telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
-
-                telemetry.update();
-            }
 
         }
 
