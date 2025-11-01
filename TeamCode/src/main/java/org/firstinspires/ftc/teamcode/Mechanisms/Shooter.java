@@ -60,12 +60,13 @@ public class Shooter
         double currVelocity = motorShooter.getVelocity(AngleUnit.RADIANS);
         double dir = Math.signum(targetVelocity - initialVelocity);
 
+
         if (!isBusy()) {
             velocitySetPoint = targetVelocity;
             accelSetPoint = 0;
         } else {
             velocitySetPoint = initialVelocity + dir * ShooterConstants.SHOOTER_ACCEL * accelTimer.time();
-            accelSetPoint = ShooterConstants.SHOOTER_ACCEL * dir;
+            accelSetPoint = ShooterConstants.SHOOTER_ACCEL;
         }
 
         PIDControl velocityPID = new PIDControl(ShooterConstants.pidCoefficients);
