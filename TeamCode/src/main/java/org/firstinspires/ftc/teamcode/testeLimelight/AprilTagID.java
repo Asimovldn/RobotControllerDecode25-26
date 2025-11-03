@@ -6,8 +6,11 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import java.util.List;
 
+@TeleOp
 public class AprilTagID extends LinearOpMode {
 
     private Limelight3A limelight;
@@ -17,8 +20,8 @@ public class AprilTagID extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        limelight.start();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.start();
         limelight.pipelineSwitch(8);
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
