@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -37,11 +38,13 @@ public class Storage
     private final double servoDownPosition = 0.91;
 
     public static PIDCoefficients pidCoefficients = new PIDCoefficients(0,0,0);
-    public static FeedForwardCoefficients ffCoefficients = new FeedForwardCoefficients(0.001,0,0);
+    public static FeedForwardCoefficients ffCoefficients = new FeedForwardCoefficients(0.001,0,0.04);
 
     private double targetPosition = 0;
 
     StoragePipeline pipeline;
+
+    private double waitTime = 200; // ms;
 
     public enum ARTIFACT
     {
@@ -127,10 +130,14 @@ public class Storage
 
             if (!isBusy())
             {
-                if (getShooterArtifact() == currGoalArtifact)
+                ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+                while (waitTimer.time() < waitTime)
                 {
-                    isSearching = false;
-                    return;
+                    if (getShooterArtifact() == currGoalArtifact)
+                    {
+                        isSearching = false;
+                        return;
+                    }
                 }
                 artifactsSearched++;
                 targetPosition += isAtShoot ? 120 : 60;
@@ -144,6 +151,12 @@ public class Storage
         currGoalArtifact = artifact;
         isSearching = true;
         artifactsSearched = 0;
+    }
+
+    public void setVelocity(double vel)
+    {
+        FeedForwardControl ffControl = new FeedForwardControl(ffCoefficients);
+        storageMotor.setPower(ffControl.calculate(vel, 0, 1));
     }
 
 
