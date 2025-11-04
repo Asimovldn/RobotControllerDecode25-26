@@ -25,15 +25,23 @@ public class StorageTest extends LinearOpMode
 
         storage.init(hardwareMap);
 
+        storage.openCamera();
+
+        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
+
+        while (opModeInInit())
+        {
+            telemetry.addData("area state: ", storage.getShooterArtifact());
+            telemetry.update();
+        }
         waitForStart();
 
         int lastPosition = 0;
 
         int dir = 1;
 
-        storage.setTargetDegrees(60);
+        storage.setGoalArtifact(Storage.ARTIFACT.GREEN);
 
-        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), telemetry);
 
         while (opModeIsActive())
         {
