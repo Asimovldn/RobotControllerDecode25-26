@@ -23,6 +23,8 @@ public class StoragePipeline extends OpenCvPipeline
     public static Scalar yellowLowerBound = new Scalar(20, 50, 50);
     public static Scalar yellowUpperBound = new Scalar(50, 255, 255);
 
+    public static String maskToShow = "input";
+
 
 
     private ARTIFACT areaState = ARTIFACT.NONE;
@@ -36,6 +38,8 @@ public class StoragePipeline extends OpenCvPipeline
     Mat purpleCrop;
     Mat yellowCrop;
 
+    Mat output = new Mat();
+
     int greenCount = 0;
     int purpleCount = 0;
     int yellowCount = 0;
@@ -48,7 +52,7 @@ public class StoragePipeline extends OpenCvPipeline
         Core.inRange(hsv, purpleLowerBound, purpleUpperBound, purpleMask);
         Core.inRange(hsv, yellowLowerBound, yellowUpperBound, yellowMask);
 
-        Rect rect = new Rect(0, 55, 319, 180);
+        Rect rect = new Rect((320 / 2) - 70, 240 - 100, 170, 100);
 
         greenCrop = greenMask.submat(rect);
         purpleCrop = purpleMask.submat(rect);
@@ -60,6 +64,22 @@ public class StoragePipeline extends OpenCvPipeline
 
         Imgproc.rectangle(input, rect, new Scalar(255,0,0), 2);
 
+        switch (maskToShow)
+        {
+            case "input":
+                input.copyTo(output);
+                break;
+
+            case "green":
+                greenCrop.copyTo(output);
+                break;
+
+            case "purple":
+                purpleCrop.copyTo(output);
+                break;
+        }
+
+
         hsv.release();
         greenMask.release();
         purpleMask.release();
@@ -68,7 +88,8 @@ public class StoragePipeline extends OpenCvPipeline
         purpleCrop.release();
         yellowCrop.release();
 
-        return input;
+
+        return output;
     }
 
     public ARTIFACT getAreaState()

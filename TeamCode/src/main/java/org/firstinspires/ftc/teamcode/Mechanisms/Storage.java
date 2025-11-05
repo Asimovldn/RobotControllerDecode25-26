@@ -34,8 +34,8 @@ public class Storage
 
     private boolean isAtShoot = false;
 
-    private final double servoLiftPosition = 0.5;
-    private final double servoDownPosition = 0.91;
+    private final double servoLiftPosition = 0.4;
+    private final double servoDownPosition = 1.0;
 
     public static PIDCoefficients pidCoefficients = new PIDCoefficients(0,0,0);
     public static FeedForwardCoefficients ffCoefficients = new FeedForwardCoefficients(0.001,0,0.04);
@@ -64,7 +64,7 @@ public class Storage
         storageMotor = hardwareMap.get(DcMotorEx.class, "storage_motor");
         storageMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        storageMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        storageMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         liftServo = hardwareMap.get(Servo.class, "lift_servo");
 
@@ -113,8 +113,7 @@ public class Storage
 
         if (isBusy())
         {
-            FeedForwardControl ffControl = new FeedForwardControl(ffCoefficients);
-            storageMotor.setPower(ffControl.calculate(90, 0, (int) Math.signum(getTargetPosition() - getMotorPosition())));
+            storageMotor.setVelocity(120, AngleUnit.DEGREES);
         } else {
             PIDControl pidControl = new PIDControl(pidCoefficients);
             storageMotor.setPower(pidControl.calculate(getMotorPosition(), getTargetPosition()));
@@ -128,7 +127,7 @@ public class Storage
                 return;
             }
 
-            if (!isBusy())
+            if (!isBusy() && isAtShoot)
             {
                 ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
                 while (waitTimer.time() < waitTime)
@@ -140,7 +139,9 @@ public class Storage
                     }
                 }
                 artifactsSearched++;
-                targetPosition += isAtShoot ? 120 : 60;
+                targetPosition += 120;
+            } else if (!isBusy() && !isAtShoot) {
+                targetPosition += 60;
                 isAtShoot = true;
             }
         }
@@ -159,11 +160,19 @@ public class Storage
         storageMotor.setPower(ffControl.calculate(vel, 0, 1));
     }
 
+    public void liftArtifact()
+    {
+        liftServo.setPosition(servoLiftPosition);
+    }
 
+    public void lowServoArtifact()
+    {
+        liftServo.setPosition(servoDownPosition);
+    }
 
     public boolean isBusy()
     {
-        return Math.abs(getTargetPosition() - getMotorPosition()) > 5;
+        return Math.abs(getTargetPosition() - getMotorPosition()) > 10;
     }
 
     public double getTargetPosition()
