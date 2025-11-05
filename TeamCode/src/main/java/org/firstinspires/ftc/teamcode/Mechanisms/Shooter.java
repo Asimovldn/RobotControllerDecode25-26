@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Control.FeedForwardControl;
 import org.firstinspires.ftc.teamcode.Control.PIDControl;
 import org.firstinspires.ftc.teamcode.Mechanisms.Constants.ShooterConstants;
@@ -26,6 +27,7 @@ public class Shooter
     private double velocitySetPoint;
     private double accelSetPoint;
 
+    private boolean alreadyShot = false;
 
     public void init(HardwareMap hardwareMap)
     {
@@ -53,9 +55,10 @@ public class Shooter
         targetVelocity = angularVelocity;
         timeToAccel = Math.abs(targetVelocity - initialVelocity) / ShooterConstants.SHOOTER_ACCEL;
         accelTimer.reset();
+        alreadyShot = false;
     }
 
-    public void updateShooter()
+    public void update()
     {
         double currVelocity = motorShooter.getVelocity(AngleUnit.RADIANS);
         double dir = Math.signum(targetVelocity - initialVelocity);
@@ -76,6 +79,33 @@ public class Shooter
                 velocityFF.calculate(velocitySetPoint, accelSetPoint, (int) dir));
     }
 
+    double lastCurrent = 0;
+
+    ElapsedTime shotTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    public boolean launchedArtifact()
+    {
+
+        if (alreadyShot)
+        {
+            if (shotTime.time() > 2000)
+            {
+                return true;
+            }
+        }
+        if (!isBusy() && !alreadyShot)
+        {
+            if (motorShooter.getCurrent(CurrentUnit.AMPS) - lastCurrent > 0.3)
+            {
+                alreadyShot = true;
+                shotTime.reset();
+            }
+        }
+
+        lastCurrent = motorShooter.getCurrent(CurrentUnit.AMPS);
+        return false;
+    }
+
+
     public boolean isBusy()
     {
         return accelTimer.time() < timeToAccel;
@@ -84,5 +114,5 @@ public class Shooter
     public double getVelocitySetPoint() { return velocitySetPoint;}
     public double getAccelSetPoint() { return accelSetPoint;}
     public double getCurrentVelocity() { return motorShooter.getVelocity(AngleUnit.DEGREES);}
-
+    public double getMotorCurrent() { return motorShooter.getCurrent(CurrentUnit.AMPS);}
 }

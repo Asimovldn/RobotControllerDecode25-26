@@ -19,12 +19,14 @@ public class Intake
 
     public void startIntake()
     {
-        intakeMotor.setPower(1.0);
+        intakeMotor.setPower(0.5);
     }
 
     public void stopIntake()
     {
         intakeMotor.setPower(0.0);
     }
+
+    public void startIntakeReverse() { intakeMotor.setPower(-0.5);}
 
 }

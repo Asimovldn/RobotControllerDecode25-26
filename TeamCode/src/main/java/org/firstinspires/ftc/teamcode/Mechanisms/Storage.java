@@ -18,23 +18,22 @@ import org.firstinspires.ftc.teamcode.Pipeline.StoragePipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvInternalCamera2;
 
 @Config
 public class Storage
 {
-    DcMotorEx storageMotor;
-    Servo liftServo;
+    private DcMotorEx storageMotor;
+    private Servo liftServo;
 
-    OpenCvCamera camera;
+    private OpenCvCamera camera;
 
     private final int TICK_PER_REV = 288;
     private final double TICK_PER_DEGREE = (int)Math.round(TICK_PER_REV / 360.0);
 
     private boolean isAtShoot = false;
 
-    private final double servoLiftPosition = 0.4;
+    private final double servoLiftPosition = 0.3;
     private final double servoDownPosition = 1.0;
 
     public static PIDCoefficients pidCoefficients = new PIDCoefficients(0,0,0);
@@ -44,8 +43,11 @@ public class Storage
 
     StoragePipeline pipeline;
 
-    private double waitTime = 200; // ms;
+    private double waitTime = 30; // ms;
 
+    public static double motorPower = 0.0;
+
+    private final int TICKS_PER_60_DEG = 45;
     public enum ARTIFACT
     {
         GREEN,
@@ -64,7 +66,7 @@ public class Storage
         storageMotor = hardwareMap.get(DcMotorEx.class, "storage_motor");
         storageMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        storageMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        storageMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         liftServo = hardwareMap.get(Servo.class, "lift_servo");
 
@@ -103,46 +105,28 @@ public class Storage
     }
 
 
-    public void setTargetDegrees(double degrees)
+    public void runToPosition(int position)
     {
-        targetPosition = degrees;
+        storageMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        storageMotor.setTargetPosition(position);
+        storageMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        storageMotor.setPower(motorPower);
     }
 
-    public void updateStorage()
+    public void searchArtifact()
     {
-
-        if (isBusy())
+        if (!isAtShoot)
         {
-            storageMotor.setVelocity(120, AngleUnit.DEGREES);
-        } else {
-            PIDControl pidControl = new PIDControl(pidCoefficients);
-            storageMotor.setPower(pidControl.calculate(getMotorPosition(), getTargetPosition()));
+            runToPosition(storageMotor.getCurrentPosition() + TICKS_PER_60_DEG);
+            isAtShoot = true;
         }
 
-        if (isSearching)
+        if (!storageMotor.isBusy() && isSearching)
         {
-            if (artifactsSearched == 3)
+            artifactsSearched++;
+            if (pipeline.getAreaState() == currGoalArtifact)
             {
-                isSearching = false;
-                return;
-            }
-
-            if (!isBusy() && isAtShoot)
-            {
-                ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-                while (waitTimer.time() < waitTime)
-                {
-                    if (getShooterArtifact() == currGoalArtifact)
-                    {
-                        isSearching = false;
-                        return;
-                    }
-                }
-                artifactsSearched++;
-                targetPosition += 120;
-            } else if (!isBusy() && !isAtShoot) {
-                targetPosition += 60;
-                isAtShoot = true;
+                
             }
         }
     }

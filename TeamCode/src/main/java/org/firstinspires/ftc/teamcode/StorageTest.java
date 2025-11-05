@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,8 +11,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.Mechanisms.Storage;
 
 @TeleOp
+@Config
 public class StorageTest extends LinearOpMode
 {
+
+    public static int pos = 0;
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -40,12 +44,11 @@ public class StorageTest extends LinearOpMode
 
         int dir = 1;
 
-        storage.setGoalArtifact(Storage.ARTIFACT.GREEN);
-
+        storage.runToPosition(pos);
 
         while (opModeIsActive())
         {
-           storage.updateStorage();
+            storage.update();
            telemetry.addData("motorPos", storage.getMotorPosition());
            telemetry.addData("targetPos", storage.getTargetPosition());
            telemetry.addData("targetVel", 90);

@@ -87,5 +87,14 @@ public class Drive
 
     }
 
+    public void setPower(double leftBackPow, double leftFrontPow, double rightBackPow, double rightFrontPow)
+    {
+        leftBack.setPower(leftBackPow);
+        leftFront.setPower(leftFrontPow);
+        rightBack.setPower(rightBackPow);
+        rightFront.setPower(rightFrontPow);
+    }
+
+
 
 }

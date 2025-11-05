@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 
 @TeleOp
@@ -30,12 +29,12 @@ public class TesteControleVel extends LinearOpMode
 
         ElapsedTime waitTimer = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
 
-        shooter.setShooterAngularVelocity(Math.toRadians(1500));
+        shooter.setShooterAngularVelocity(Math.toRadians(1300));
 
         while (opModeIsActive())
         {
 
-            shooter.updateShooter();
+            shooter.update();
             telemetry.addData("velocitySetPoint", Math.toDegrees(shooter.getVelocitySetPoint()));
             telemetry.addData("accelSetPoint", shooter.getAccelSetPoint());
             telemetry.addData("motorVelocity", shooter.getCurrentVelocity());
